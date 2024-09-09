@@ -7,7 +7,7 @@ function ListProdDetail() {
     const {id} = useParams()
 
     useEffect(() => {
-        fetch(`https://86yfl7-8080.csb.app/books/${id}`)
+        fetch(`https://h5ltj4-8080.csb.app/books/${id}`)
             .then(response => response.json())
             .then(data => setProductDetail(data))
             .catch(error => console.error('Error fetching data:', error));

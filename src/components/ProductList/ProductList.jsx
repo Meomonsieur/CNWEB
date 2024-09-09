@@ -10,7 +10,7 @@ function ProductList() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get('https://86yfl7-8080.csb.app/books');
+                const response = await axios.get('https://h5ltj4-8080.csb.app/books');
                 setProductList(response.data); 
             } catch (error) {
                 console.error('Error fetching data:', error);

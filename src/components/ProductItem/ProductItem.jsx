@@ -55,7 +55,7 @@ function ProductItem({ product }) {
                     <div className="name-rate-sold">
                         <h3 className="item-product-name">{name}</h3>
                         <div className="rate-and-sold flex justify-start items-baseline">
-                            <div className="item-product-rating">
+                            {/* <div className="item-product-rating">
                                 {[...Array(5).keys()].map(index => (
                                     <i key={index} className={`fa-solid fa-star ${index < rating_average ? 'star-gold' : 'star-gray'}`}></i>
                                 ))}
@@ -67,7 +67,7 @@ function ProductItem({ product }) {
                                 {[...Array(rating).keys()].map((_, index) => (
                                     <i key={index} className="star-gold fa-solid fa-star"></i>
                                 ))}
-                            </div>
+                            </div> */}
                             <div className="item-product-sold">{quantitySoldText}</div>
                         </div>
                     </div>

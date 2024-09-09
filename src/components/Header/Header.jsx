@@ -6,6 +6,9 @@ function Header() {
     const [searchHistory, setSearchHistory] = useState([]);
     const [isHistoryVisible, setIsHistoryVisible] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
+    const [filteredSearchHistory, setFilteredSearchHistory] = useState(searchHistory);
+    const [selectedCategories, setSelectedCategories] = useState([]);
+    const [selectedVendors, setSelectedVendors] = useState([]);
 
     const openHistory = () => {
         setIsHistoryVisible(true);
@@ -14,17 +17,59 @@ function Header() {
         setIsHistoryVisible(false);
     };
 
-    const handleInputChange = (event) => {
-        setSearchTerm(event.target.value);
+    const handleInputChange = (e) => {
+        const keyword = e.target.value;
+        setSearchTerm(keyword);
+
+        filterSearchHistory(keyword, selectedCategories, selectedVendors);
     };
+
+    const filterSearchHistory = (keyword, categories, vendors) => {
+        let filtered = searchHistory;
+
+        if (keyword.trim() !== "") {
+            filtered = filtered.filter((item) =>
+                item.name.toLowerCase().includes(keyword.toLowerCase())
+            );
+        }
+
+        if (categories.length > 0) {
+            filtered = filtered.filter((item) => categories.includes(item.category));
+        }
+
+        if (vendors.length > 0) {
+            filtered = filtered.filter((item) => vendors.includes(item.vendor));
+        }
+
+        setFilteredSearchHistory(filtered);
+    };
+
+    const handleCategoryChange = (category) => {
+        const updatedCategories = selectedCategories.includes(category)
+            ? selectedCategories.filter((c) => c !== category)
+            : [...selectedCategories, category];
+
+        setSelectedCategories(updatedCategories);
+        filterSearchHistory(searchTerm, updatedCategories, selectedVendors);
+    };
+
+    const handleVendorChange = (vendor) => {
+        const updatedVendors = selectedVendors.includes(vendor)
+            ? selectedVendors.filter((v) => v !== vendor)
+            : [...selectedVendors, vendor];
+
+        setSelectedVendors(updatedVendors);
+        filterSearchHistory(searchTerm, selectedCategories, updatedVendors);
+    };
+
     const highlightKeyword = (text) => {
         if (!searchTerm) return text;
         const regex = new RegExp(`(${searchTerm})`, 'gi');
         return text.replace(regex, '<span class="highlight">$1</span>');
     };
-
+    
     useEffect(() => {
-        fetch('https://86yfl7-8080.csb.app/books')
+        fetch('https://h5ltj4-8080.csb.app/books')
             .then(response => response.json())
             .then(data => setSearchHistory(data))
             .catch(error => console.error('Error fetching search history:', error));
@@ -56,16 +101,16 @@ function Header() {
                                 </div>
                             </div>
                             <ul className="header__search-history-list">
-                                {searchHistory && searchHistory.length > 0 && searchHistory.map((item, index) => (
-                                    <li key={index} className="header__search-history-item">
-                                        <a href={item.current_seller?.link}>
-                                            <img src="https://salt.tikicdn.com/ts/upload/e8/aa/26/42a11360f906c4e769a0ff144d04bfe1.png" alt="" />
-                                            {/* <p>{item.name}</p> */}
-                                            <p dangerouslySetInnerHTML={{ __html: highlightKeyword(item.name) }} />
-                                        </a>
-                                    </li>
-                                ))}
+                              {filteredSearchHistory && filteredSearchHistory.length > 0 && filteredSearchHistory.map((item, index) => (
+                                <li key={index} className="header__search-history-item">
+                                  <a href={item.id}>
+                                    <img src="https://salt.tikicdn.com/ts/upload/e8/aa/26/42a11360f906c4e769a0ff144d04bfe1.png" alt="" />
+                                    <p dangerouslySetInnerHTML={{ __html: highlightKeyword(item.name) }} />
+                                  </a>
+                                </li>
+                            ))}
                             </ul>
+
                         </div>
                     )}
                 </div>
@@ -201,28 +246,31 @@ function Header() {
                             <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
                         </svg>
                     </button>
-                    <input type="text" placeholder="Freeship giảm đến 30k" className="header__search-input mx-4" onClick={openHistory} />
+                    <input type="text" placeholder="Freeship giảm đến 30k" className="header__search-input mx-4" onClick={openHistory} onChange={handleInputChange} />
                     <button className="header__search-btn">Tìm kiếm</button>
 
-                    <div className="header__search-history">
-                        <div className="header__search-history-heading">
-                            <h3 className="header__search-history-heading--title">Hàng nhập khẩu</h3>
-                            <div className="header__search-history-heading--close" onClick={() => setIsHistoryVisible(false)}>
-                                <i className="fa-solid fa-xmark"></i>
-                                <span>Đóng</span>
+                    {isHistoryVisible && (
+                        <div className="header__search-history">
+                            <div className="header__search-history-heading">
+                                <h3 className="header__search-history-heading--title">Hàng nhập khẩu</h3>
+                                <div className="header__search-history-heading--close" onClick={closeHistory}>
+                                    <i className="fa-solid fa-xmark"></i>
+                                    <span>Đóng</span>
+                                </div>
                             </div>
-                        </div>
-                        <ul className="header__search-history-list">
-                            {searchHistory.map((item, index) => (
+                            <ul className="header__search-history-list">
+                              {filteredSearchHistory && filteredSearchHistory.length > 0 && filteredSearchHistory.map((item, index) => (
                                 <li key={index} className="header__search-history-item">
-                                    <a href={item.current_seller?.link}>
-                                        <img src="https://salt.tikicdn.com/ts/upload/e8/aa/26/42a11360f906c4e769a0ff144d04bfe1.png" alt="" />
-                                        <p>{item.name}</p>
-                                    </a>
+                                  <a href={item.id}>
+                                    <img src="https://salt.tikicdn.com/ts/upload/e8/aa/26/42a11360f906c4e769a0ff144d04bfe1.png" alt="" />
+                                    <p dangerouslySetInnerHTML={{ __html: highlightKeyword(item.name) }} />
+                                  </a>
                                 </li>
                             ))}
-                        </ul>
-                    </div>
+                            </ul>
+
+                        </div>
+                    )}  
                 </div>
                 <div className="aside__heading flex items-center mb-2 ml-4">
                     <a href='/' className="aside__heading-home">Trang chủ</a>
